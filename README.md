@@ -5,7 +5,7 @@ NFTMart developer documentation.
 
 You can read it [online](https://nftt-studio.github.io/nftmart-docs/) or build it locally:
 
-## install `mdbook`
+## install [mdbook](https://rust-lang.github.io/mdBook/)
 
 ```
 $ cargo install mdbook
