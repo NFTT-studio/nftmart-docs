@@ -1,6 +1,6 @@
 push:
 	sudo rm -r docs
-	mdbook build
+	env RUSTDOCFLAGS="--default-theme=rust" mdbook build
 	git -C docs add .
 	git -C docs branch -D gh-pages
 	git -C docs checkout -b gh-pages
