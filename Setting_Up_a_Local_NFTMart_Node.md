@@ -10,13 +10,11 @@ A NFTMart development node is your own personal development environment for buil
 
 ## Getting Started
 
-First, start by cloning  the NFTMart repo that you can find here:
-
-https://github.com/NFTMart/
+First, start by cloning the NFTMart repo that you can find [here](https://github.com/nftt-studio/nftmart-node):
 
 ```
-git clone -b dev https://github.com/NFTMart/NFTMart.git
-cd NFTMart
+git clone https://github.com/nftt-studio/nftmart-node
+cd nftmart-node
 ```
 
 Next, install Substrate and all its prerequisites (including Rust) by executing:
@@ -28,13 +26,13 @@ curl https://getsubstrate.io -sSf | bash -s -- --fast
 Once you have followed all of the procedures above, it's time to build the development node by running:
 
 ```
-cargo build --release
+cargo build --release -p node-cli
 ```
 
 Then, you will want to run the node using the following command:
 
 ```
-./target/release/minix --tmp --chain=dev-evm --alice --rpc-port=8545 --rpc-cors=all -levm=trace
+./target/release/nftmart-node --tmp --chain=dev-evm --alice --rpc-port=8545 --rpc-cors=all -levm=trace
 ```
 
 ## Connecting Polkadot JS Apps to a Local NFTMart Node
