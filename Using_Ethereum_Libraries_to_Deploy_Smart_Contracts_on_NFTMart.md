@@ -2,17 +2,19 @@
 
 ## Introduction
 
-This guide walks through using the Solidity compiler and two different Ethereum libraries to sign and send a transaction on NFTMart manually. The two libraries covered by this tutorial are:
+This guide walks through using the Solidity compiler and two different Ethereum
+libraries to sign and send a transaction on NFTMart manually. The two libraries
+covered by this tutorial are:
 
 - [Web3.js](https://web3js.readthedocs.io/)
 
 - [Ethers.js](https://docs.ethers.io/)
 
-  
-
 ## Checking Prerequisites
 
-The examples using both web3.js and ethers.js need you to install Node.js and NPM previously. For the web3.py, you need Python and PIP. As of the writing of this guide, the versions used were:
+The examples using both web3.js and ethers.js need you to install Node.js and
+NPM previously. For the web3.py, you need Python and PIP. As of the writing of
+this guide, the versions used were:
 
 - Node.js v15.10.0
 - NPM v7.5.3
@@ -23,7 +25,8 @@ Next, create a directory to store all of the relevant files:
 mkdir incrementer && cd incrementer/
 ```
 
-For the JavaScript libraries, first, you can create a simple `package.json` file (not required):
+For the JavaScript libraries, first, you can create a simple `package.json` file
+(not required):
 
 ```
 npm init --yes
@@ -45,7 +48,8 @@ npm i ethers npm i solc@0.8.0
 
 ## The Contract File
 
-The contract used is a simple incrementer, arbitrarily named *Incrementer.sol*. The Solidity code is the following:
+The contract used is a simple incrementer, arbitrarily named _Incrementer.sol_.
+The Solidity code is the following:
 
 ```
 pragma solidity ^0.8.0;
@@ -67,13 +71,20 @@ contract Incrementer {
 }
 ```
 
-The `constructor` function, which runs when the contract is deployed, sets the initial value of the number variable stored on-chain (default is 0). The `increment` function adds the `_value` provided to the current number, but a transaction needs to be sent, which modifies the stored data. Lastly, the `reset` function resets the stored value to zero.
+The `constructor` function, which runs when the contract is deployed, sets the
+initial value of the number variable stored on-chain (default is 0). The
+`increment` function adds the `_value` provided to the current number, but a
+transaction needs to be sent, which modifies the stored data. Lastly, the
+`reset` function resets the stored value to zero.
 
 ## Compiling the Contract
 
-The only purpose of the compile file is to use the Solidity compiler to output the bytecode and interface (ABI) our contract. (they were arbitrarily named `compile.js`)
+The only purpose of the compile file is to use the Solidity compiler to output
+the bytecode and interface (ABI) our contract. (they were arbitrarily named
+`compile.js`)
 
-The compile file for both JavaScript libraries is the same as they share the JavaScript bindings for the Solidity compiler (same package).
+The compile file for both JavaScript libraries is the same as they share the
+JavaScript bindings for the Solidity compiler (same package).
 
 Web3.js/Ethers.js
 
@@ -109,19 +120,30 @@ const contractFile = tempFile.contracts['Incrementer.sol']['Incrementer'];
 module.exports = contractFile;
 ```
 
-In the first part of the script, the contract's path is fetched, and its content read.
+In the first part of the script, the contract's path is fetched, and its content
+read.
 
-Next, the Solidity compiler's input object is built, and it is passed as input to the `solc.compile` function.
+Next, the Solidity compiler's input object is built, and it is passed as input
+to the `solc.compile` function.
 
-Lastly, extract the data of the `Incrementer` contract of the `Incrementer.sol` file, and export it so that the deployment script can use it.
+Lastly, extract the data of the `Incrementer` contract of the `Incrementer.sol`
+file, and export it so that the deployment script can use it.
 
 ## Deploying the Contract
 
-Regardless of the library, the strategy to deploy the compiled smart contract is somewhat similar. A contract instance is created using its interface (ABI) and bytecode. From this instance, a deployment function is used to send a signed transaction that deploys the contract.
+Regardless of the library, the strategy to deploy the compiled smart contract is
+somewhat similar. A contract instance is created using its interface (ABI) and
+bytecode. From this instance, a deployment function is used to send a signed
+transaction that deploys the contract.
 
-For simplicity, the deploy file is composed of two sections. In the first section ("Define Provider & Variables"), the library to use and the ABI and bytecode of the contract are imported. Also, the provider and account from (with the private key) are defined. 
+For simplicity, the deploy file is composed of two sections. In the first
+section ("Define Provider & Variables"), the library to use and the ABI and
+bytecode of the contract are imported. Also, the provider and account from (with
+the private key) are defined.
 
-The second section ("Deploy Contract") outlines the actual contract deployment part. Note that for this example, the initial value of the `number` variable was set to 5. Some of the key takeaways are discussed next.
+The second section ("Deploy Contract") outlines the actual contract deployment
+part. Note that for this example, the initial value of the `number` variable was
+set to 5. Some of the key takeaways are discussed next.
 
 Web3.js
 
@@ -242,33 +264,65 @@ deploy();
 
 ### Web3.js
 
-In the first part of the script, the `web3` instance (or provider) is created using the `Web3` constructor with the provider RPC. By changing the provider RPC given to the constructor, you can choose which network you want to send the transaction to.
+In the first part of the script, the `web3` instance (or provider) is created
+using the `Web3` constructor with the provider RPC. By changing the provider RPC
+given to the constructor, you can choose which network you want to send the
+transaction to.
 
-The private key, and the public address associated with it, are defined for signing the transaction and logging purposes. Only the private key is required. Also, the contract's bytecode and interface (ABI) are fetched from the compile's export.
+The private key, and the public address associated with it, are defined for
+signing the transaction and logging purposes. Only the private key is required.
+Also, the contract's bytecode and interface (ABI) are fetched from the compile's
+export.
 
-In the second section, a contract instance is created by providing the ABI. Next, the `deploy` function is used, which needs the bytecode and arguments of the constructor function. This will generate the constructor transaction object.
+In the second section, a contract instance is created by providing the ABI.
+Next, the `deploy` function is used, which needs the bytecode and arguments of
+the constructor function. This will generate the constructor transaction object.
 
-Afterwards, the constructor transaction can be signed using the `web3.eth.accounts.signTransaction()` method. The data field corresponds to the bytecode, and the constructor input arguments are encoded together. Note that the value of gas is obtained using `estimateGas()` option inside the constructor transaction.
+Afterwards, the constructor transaction can be signed using the
+`web3.eth.accounts.signTransaction()` method. The data field corresponds to the
+bytecode, and the constructor input arguments are encoded together. Note that
+the value of gas is obtained using `estimateGas()` option inside the constructor
+transaction.
 
-Lastly, the signed transaction is sent, and the contract's address is displayed in the terminal.
+Lastly, the signed transaction is sent, and the contract's address is displayed
+in the terminal.
 
 ### Ethers.js
 
-In the first part of the script, different networks can be specified with a name, RPC URL (required), and chain ID. The provider (similar to the `web3` instance) is created with the `ethers.providers.StaticJsonRpcProvider` method. An alternative is to use the `ethers.providers.JsonRpcProvide(providerRPC)` method, which only requires the provider RPC endpoint address. But this might created compatibility issues with individual project specifications.
+In the first part of the script, different networks can be specified with a
+name, RPC URL (required), and chain ID. The provider (similar to the `web3`
+instance) is created with the `ethers.providers.StaticJsonRpcProvider` method.
+An alternative is to use the `ethers.providers.JsonRpcProvide(providerRPC)`
+method, which only requires the provider RPC endpoint address. But this might
+created compatibility issues with individual project specifications.
 
-The private key is defined to create a wallet instance, which also requires the provider from the previous step. The wallet instance is used to sign transactions. Also, the contract's bytecode and interface (ABI) are fetched from the compile's export.
+The private key is defined to create a wallet instance, which also requires the
+provider from the previous step. The wallet instance is used to sign
+transactions. Also, the contract's bytecode and interface (ABI) are fetched from
+the compile's export.
 
-In the second section, a contract instance is created with `ethers.ContractFactory()`, providing the ABI, bytecode, and wallet. Thus, the contract instance already has a signer. Next, the `deploy` function is used, which needs the constructor input arguments. This will send the transaction for contract deployment. To wait for a transaction receipt you can use the `deployed()` method of the contract deployment transaction.
+In the second section, a contract instance is created with
+`ethers.ContractFactory()`, providing the ABI, bytecode, and wallet. Thus, the
+contract instance already has a signer. Next, the `deploy` function is used,
+which needs the constructor input arguments. This will send the transaction for
+contract deployment. To wait for a transaction receipt you can use the
+`deployed()` method of the contract deployment transaction.
 
 Lastly, the contract's address is displayed in the terminal.
 
 ## Reading from the Contract (Call Methods)
 
-Call methods are the type of interaction that don't modify the contract's storage (change variables), meaning no transaction needs to be sent.
+Call methods are the type of interaction that don't modify the contract's
+storage (change variables), meaning no transaction needs to be sent.
 
-For simplicity, the get file is composed of two sections. In the first section ("Define Provider & Variables"), the library to use and the ABI of the contract are imported. Also, the provider and the contract's address are defined. 
+For simplicity, the get file is composed of two sections. In the first section
+("Define Provider & Variables"), the library to use and the ABI of the contract
+are imported. Also, the provider and the contract's address are defined.
 
-The second section ("Call Function") outlines the actual call to the contract. Regardless of the library, a contract instance is created (linked to the contract's address), from which the call method is queried. Some of the key takeaways are discussed next.
+The second section ("Call Function") outlines the actual call to the contract.
+Regardless of the library, a contract instance is created (linked to the
+contract's address), from which the call method is queried. Some of the key
+takeaways are discussed next.
 
 Web3.js
 
@@ -356,35 +410,60 @@ const get = async () => {
 get();
 ```
 
-### Web3.js 
+### Web3.js
 
-In the first part of the script, the `web3` instance (or provider) is created using the `Web3` constructor with the provider RPC. By changing the provider RPC given to the constructor, you can choose which network you want to send the transaction to.
+In the first part of the script, the `web3` instance (or provider) is created
+using the `Web3` constructor with the provider RPC. By changing the provider RPC
+given to the constructor, you can choose which network you want to send the
+transaction to.
 
-The contract's interface (ABI) and address are needed as well to interact with it.
+The contract's interface (ABI) and address are needed as well to interact with
+it.
 
-In the second section, a contract instance is created with `web3.eth.Contract()` by providing the ABI and address. Next, the method to call can be queried with the `contract.methods.methodName(_input).call()` function, replacing `contract`, `methodName` and `_input` with the contract instance, function to call, and input of the function (if necessary). This promise, when resolved, will return the value requested.
+In the second section, a contract instance is created with `web3.eth.Contract()`
+by providing the ABI and address. Next, the method to call can be queried with
+the `contract.methods.methodName(_input).call()` function, replacing `contract`,
+`methodName` and `_input` with the contract instance, function to call, and
+input of the function (if necessary). This promise, when resolved, will return
+the value requested.
 
 Lastly, the value is displayed in the terminal.
 
 ### Ethers.js
 
-In the first part of the script, different networks can be specified with a name, RPC URL (required), and chain ID. The provider (similar to the `web3` instance) is created with the `ethers.providers.StaticJsonRpcProvider` method. An alternative is to use the `ethers.providers.JsonRpcProvide(providerRPC)` method, which only requires the provider RPC endpoint address. But this might created compatibility issues with individual project specifications.
+In the first part of the script, different networks can be specified with a
+name, RPC URL (required), and chain ID. The provider (similar to the `web3`
+instance) is created with the `ethers.providers.StaticJsonRpcProvider` method.
+An alternative is to use the `ethers.providers.JsonRpcProvide(providerRPC)`
+method, which only requires the provider RPC endpoint address. But this might
+created compatibility issues with individual project specifications.
 
-The contract's interface (ABI) and address are needed as well to interact with it.
+The contract's interface (ABI) and address are needed as well to interact with
+it.
 
-In the second section, a contract instance is created with `ethers.Contract()`, providing its address, ABI, and the provider. Next, the method to call can be queried with the `contract.methodName(_input)` function, replacing `contract` `methodName`, and `_input` with the contract instance, function to call, and input of the function (if necessary). This promise, when resolved, will return the value requested.
+In the second section, a contract instance is created with `ethers.Contract()`,
+providing its address, ABI, and the provider. Next, the method to call can be
+queried with the `contract.methodName(_input)` function, replacing `contract`
+`methodName`, and `_input` with the contract instance, function to call, and
+input of the function (if necessary). This promise, when resolved, will return
+the value requested.
 
 Lastly, the value is displayed in the terminal.
 
-
-
 ## Interacting with the Contract (Send Methods)
 
-Send methods are the type of interaction that modify the contract's storage (change variables), meaning a transaction needs to be signed and sent.
+Send methods are the type of interaction that modify the contract's storage
+(change variables), meaning a transaction needs to be signed and sent.
 
-For simplicity, the increment file is composed of two sections. In the first section ("Define Provider & Variables"), the library to use and the ABI of the contract are imported. The provider, the contract's address, and the value of the `increment` function are also defined. 
+For simplicity, the increment file is composed of two sections. In the first
+section ("Define Provider & Variables"), the library to use and the ABI of the
+contract are imported. The provider, the contract's address, and the value of
+the `increment` function are also defined.
 
-The second section ("Send Function") outlines the actual function to be called with the transaction. Regardless of the library, a contract instance is created (linked to the contract's address), from which the function to be used is queried.
+The second section ("Send Function") outlines the actual function to be called
+with the transaction. Regardless of the library, a contract instance is created
+(linked to the contract's address), from which the function to be used is
+queried.
 
 Web3.js
 
@@ -443,8 +522,6 @@ const increment = async () => {
 
 increment();
 ```
-
-
 
 Ethers.js
 
@@ -505,34 +582,68 @@ increment();
 
 ### Web3.js
 
-In the first part of the script, the `web3` instance (or provider) is created using the `Web3` constructor with the provider RPC. By changing the provider RPC given to the constructor, you can choose which network you want to send the transaction to.
+In the first part of the script, the `web3` instance (or provider) is created
+using the `Web3` constructor with the provider RPC. By changing the provider RPC
+given to the constructor, you can choose which network you want to send the
+transaction to.
 
-The private key, and the public address associated with it, are defined for signing the transaction and logging purposes. Only the private key is required. Also, the contract's interface (ABI) and address are needed to interact with it. If necessary, you can define any variable required as input to the function you are going to interact with.
+The private key, and the public address associated with it, are defined for
+signing the transaction and logging purposes. Only the private key is required.
+Also, the contract's interface (ABI) and address are needed to interact with it.
+If necessary, you can define any variable required as input to the function you
+are going to interact with.
 
-In the second section, a contract instance is created with `web3.eth.Contract()` by providing the ABI and address. Next, you can build the transaction object with the `contract.methods.methodName(_input)` function, replacing `contract`, `methodName` and `_input` with the contract instance, function to call, and input of the function (if necessary).
+In the second section, a contract instance is created with `web3.eth.Contract()`
+by providing the ABI and address. Next, you can build the transaction object
+with the `contract.methods.methodName(_input)` function, replacing `contract`,
+`methodName` and `_input` with the contract instance, function to call, and
+input of the function (if necessary).
 
-Afterwards, the transaction can be signed using the `web3.eth.accounts.signTransaction()` method. The data field corresponds to the transaction object from the previous step. Note that the value of gas is obtained using `estimateGas()` option inside the transaction object.
+Afterwards, the transaction can be signed using the
+`web3.eth.accounts.signTransaction()` method. The data field corresponds to the
+transaction object from the previous step. Note that the value of gas is
+obtained using `estimateGas()` option inside the transaction object.
 
-Lastly, the signed transaction is sent, and the transaction hash is displayed in the terminal.
+Lastly, the signed transaction is sent, and the transaction hash is displayed in
+the terminal.
 
 ### Ethers.js
 
-In the first part of the script, different networks can be specified with a name, RPC URL (required), and chain ID. The provider (similar to the `web3` instance) is created with the `ethers.providers.StaticJsonRpcProvider` method. An alternative is to use the `ethers.providers.JsonRpcProvide(providerRPC)` method, which only requires the provider RPC endpoint address. But this might created compatibility issues with individual project specifications.
+In the first part of the script, different networks can be specified with a
+name, RPC URL (required), and chain ID. The provider (similar to the `web3`
+instance) is created with the `ethers.providers.StaticJsonRpcProvider` method.
+An alternative is to use the `ethers.providers.JsonRpcProvide(providerRPC)`
+method, which only requires the provider RPC endpoint address. But this might
+created compatibility issues with individual project specifications.
 
-The private key is defined to create a wallet instance, which also requires the provider from the previous step. The wallet instance is used to sign transactions. Also, the contract's interface (ABI) and address are needed to interact with it. If necessary, you can define any variable required as input to the function you are going to interact with.
+The private key is defined to create a wallet instance, which also requires the
+provider from the previous step. The wallet instance is used to sign
+transactions. Also, the contract's interface (ABI) and address are needed to
+interact with it. If necessary, you can define any variable required as input to
+the function you are going to interact with.
 
-In the second section, a contract instance is created with `ethers.Contract()`, providing its address, ABI, and wallet. Thus, the contract instance already has a signer. Next, transaction corresponding to a specific function can be send with the `contract.methodName(_input)` function, replacing `contract`, `methodName` and `_input` with the contract instance, function to call, and input of the function (if necessary). To wait for a transaction receipt, you can use the `wait()` method of the contract deployment transaction.
+In the second section, a contract instance is created with `ethers.Contract()`,
+providing its address, ABI, and wallet. Thus, the contract instance already has
+a signer. Next, transaction corresponding to a specific function can be send
+with the `contract.methodName(_input)` function, replacing `contract`,
+`methodName` and `_input` with the contract instance, function to call, and
+input of the function (if necessary). To wait for a transaction receipt, you can
+use the `wait()` method of the contract deployment transaction.
 
 Lastly, the transaction hash is displayed in the terminal.
 
 ## Running the Scripts
 
-For this section, the code shown before was adapted to target a development node, which you can run by following  *Setting Up a Local NFTMart Node* .  Also, each transaction was sent from the pre-funded account that comes with the node:
+For this section, the code shown before was adapted to target a development
+node, which you can run by following _Setting Up a Local NFTMart Node_ . Also,
+each transaction was sent from the pre-funded account that comes with the node:
 
-- Private key: `99B3C12287537E38C90A9219D4CB074A89A16E9CDB20BF85728EBD97C343E342`
+- Private key:
+  `99B3C12287537E38C90A9219D4CB074A89A16E9CDB20BF85728EBD97C343E342`
 - Public address: `0x6Be02d1d3665660d22FF9624b7BE0551ee1Ac91b`
 
-(1). First, deploy the contract by running (note that the directory was renamed for each library):
+(1). First, deploy the contract by running (note that the directory was renamed
+for each library):
 
 Web3.js
 
@@ -564,9 +675,9 @@ Attempting to deploy from account: 0x6Be02d1d3665660d22FF9624b7BE0551ee1Ac91b
 Contract deployed at address: 0x42e2EE7Ba8975c473157634Ac2AF4098190fc741
 ```
 
-
-
-(2). Next,  set the contract address in the get.js and increment.js ,  then , run the increment file. You can use the get file to verify the value of the number stored in the contract before and after increment it:
+(2). Next, set the contract address in the get.js and increment.js , then , run
+the increment file. You can use the get file to verify the value of the number
+stored in the contract before and after increment it:
 
 Web3.js
 
@@ -590,7 +701,8 @@ node increment.js
 node get.js
 ```
 
-This will display the value before the increment transaction, the hash of the transaction, and the value after the increment transaction:
+This will display the value before the increment transaction, the hash of the
+transaction, and the value after the increment transaction:
 
 Web3.js
 
@@ -609,8 +721,6 @@ Making a call to contract at address: 0xC2Bf5F29a4384b1aB0C063e1c666f02121B6084a
 The current number stored is: 8
 ```
 
-
-
 Ethers.js
 
 ```
@@ -626,8 +736,3 @@ Tx successful with hash: 0xcce5908307dc0d2e29b3dda1503cc2c4b3ea710db7d520567c5b8
 Making a call to contract at address: 0x42e2EE7Ba8975c473157634Ac2AF4098190fc741
 The current number stored is: 8
 ```
-
-
-
-
-

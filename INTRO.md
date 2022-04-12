@@ -1,4 +1,3 @@
-NFTMart Docs
-============
+# NFTMart Docs
 
 NFTMart developer documentation.
