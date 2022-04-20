@@ -12,3 +12,6 @@
 - [Using with MetaMask](Using_with_MetaMask.md)
 - [Using with Remix](Using_with_Remix.md)
 - [Using with Truffle](Using_with_Truffle.md)
+  - [Basic Contract](Using_with_Truffle_Basic.md)
+  - [ERC20 Contract](Using_with_Truffle_Erc20.md)
+  - [ERC721 Contract](Using_with_Truffle_Erc721.md)
